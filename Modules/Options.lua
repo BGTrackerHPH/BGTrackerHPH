@@ -1,5 +1,29 @@
 local L = LibStub("AceLocale-3.0"):GetLocale("BGTrackerHPH");
 
+function getMaxHonorForRank(rank)
+  rankTable = {
+    [1] = {11250},
+    [2] = {4500, 22500, 33750, 45000},
+    [3] = {11250, 33750, 45000, 77500},
+    [4] = {22500, 45000, 77500, 110000},
+    [5] = {33750, 77500, 110000, 142500},
+    [6] = {45000, 110000, 142500, 175000},
+    [7] = {77500, 142500, 175000, 256250},
+    [8] = {110000, 175000, 256250, 337500},
+    [9] = {142500, 256250, 337500, 418750},
+    [10] = {175000, 337500, 418750, 500000},
+    [11] = {256250, 418750, 500000},
+    [12] = {337500, 500000},
+    [13] = {418750},
+    [14] = {0},
+  };
+
+  if (rankTable[rank] and rankTable[rank][1]) then
+    return rankTable[rank][1];
+  end
+  return 11250;
+end
+
 function BGTHPH:buildDatabase()
   if (not self.db.global[BGTHPH.realm]) then
     self.db.global[BGTHPH.realm] = {};
@@ -27,6 +51,9 @@ function BGTHPH:buildDatabase()
   end
   if (not self.db.global[BGTHPH.realm].myChars[UnitName("player")].activeBg) then
     self.db.global[BGTHPH.realm].myChars[UnitName("player")].activeBg = {};
+  end
+  if (not self.db.global[BGTHPH.realm].myChars[UnitName("player")].targetHonor) then
+    self.db.global[BGTHPH.realm].myChars[UnitName("player")].targetHonor = self:getMaxHonorForRank(UnitPVPRank("player"));
   end
   self.data = self.db.global[BGTHPH.realm];
 end
