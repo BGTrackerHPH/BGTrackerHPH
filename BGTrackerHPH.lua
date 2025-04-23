@@ -94,7 +94,7 @@ function BGTHPH:updateMinimapButton(tooltip, frame)
     return;
   end
   tooltip:ClearLines()
-  tooltip:AddLine("AV - Am I Done Yet?")
+  tooltip:AddLine("BG Tracker HPH")
   if (tooltip.BGTHPHSeparator) then
     tooltip.BGTHPHSeparator:Hide();
     tooltip.BGTHPHSeparator2:Hide();
