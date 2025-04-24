@@ -46,6 +46,16 @@ function BGTHPH:buildDatabase()
   if (not self.db.global[BGTHPH.realm].myChars[UnitName("player")].currentWeekHonor) then
     self.db.global[BGTHPH.realm].myChars[UnitName("player")].currentWeekHonor = 0;
   end
+  if (not self.db.global[BGTHPH.realm].myChars[UnitName("player")].sessionStartHonor) then
+    hk, hp = GetPVPThisWeekStats();
+    self.db.global[BGTHPH.realm].myChars[UnitName("player")].sessionStartHonor = hp;
+  end
+  if (not self.db.global[BGTHPH.realm].myChars[UnitName("player")].sessionHonor) then
+    self.db.global[BGTHPH.realm].myChars[UnitName("player")].sessionHonor = 0;
+  end
+  if (not self.db.global[BGTHPH.realm].myChars[UnitName("player")].honorRecords) then
+    self.db.global[BGTHPH.realm].myChars[UnitName("player")].honorRecords = {};
+  end
   if (not self.db.global[BGTHPH.realm].myChars[UnitName("player")].battlegrounds) then
     self.db.global[BGTHPH.realm].myChars[UnitName("player")].battlegrounds = {};
   end

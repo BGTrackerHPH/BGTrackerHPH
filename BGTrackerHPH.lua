@@ -22,6 +22,8 @@ function BGTHPH:OnInitialize()
   self.BGTHPHOptions = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("BGTrackerHPH", "BG Tracker HPH");
   self:buildDatabase();
   self:setCurrentHonor();
+  self:setSessionStartHonor();
+  self:clearSessionHonor()
   self:createBroker();
   self:removeStaleActiveBg();
   self:clearDataAfterReset();
@@ -157,31 +159,37 @@ function BGTHPH:enterBg()
   self:enterBattleground();
 end
 
-function BGTHPH:addBg(channel)
+function BGTHPH:addBg(arg)
   self:recordEndBattlegroundData(0)
+end
+
+function BGTHPH:removeLastBg(arg)
+  self:removeLastBattlegroundEntry(arg);
 end
 
 SLASH_BGTHPHCMD1, SLASH_BGTHPHCMD2 = '/BGTHPH', '/amidoneyet';
 function SlashCmdList.BGTHPHCMD(msg, editBox)
-  local cmd, channel, extra;
+  local cmd, arg, extra;
   if (msg) then
     msg = string.lower(msg);
-    cmd, channel, extra = strsplit(" ", msg, 3);
+    cmd, arg, extra = strsplit(" ", msg, 3);
   end
-  if (msg == "debugLastBg") then
+  if (cmd == "debugLastBg") then
     BGTHPH:debug();
-  elseif (msg == "clear") then
+  elseif (cmd == "clear") then
     BGTHPH:clear();
-  elseif (msg == "bgreport") then
+  elseif (cmd == "bgreport") then
     BGTHPH:bgReport();
-  elseif (msg == "last") then
-    BGTHPH:findBgByLastActiveStart(channel);
-  elseif (msg == "addbg") then
+  elseif (cmd == "last") then
+    BGTHPH:findBgByLastActiveStart(arg);
+  elseif (cmd == "addbg") then
     BGTHPH:addBg();
-  elseif (msg == "enterbg") then
+  elseif (cmd == "enterbg") then
     BGTHPH:enterBg();
-  elseif (msg == "version") then
+  elseif (cmd == "version") then
     print(self.version)
+  elseif (cmd == "rmlastbg") then
+    BGTHPH:removeLastBg(arg);
   end
 end
 

@@ -3,6 +3,25 @@ function BGTHPH:setCurrentHonor()
   self.db.global[BGTHPH.realm].myChars[UnitName("player")].currentWeekHonor = hp;
 end
 
+function BGTHPH:setSessionStartHonor()
+  hk, hp = GetPVPThisWeekStats();
+  self.db.global[BGTHPH.realm].myChars[UnitName("player")].sessionStartHonor = hp;
+end
+
+function BGTHPH:removeLastBattlegroundEntry(index)
+  rmIndex = index or 1;
+  battleGrounds = self.db.global[BGTHPH.realm].myChars[UnitName("player")].battlegrounds;
+  if (battleGrounds) then
+    newBattleGrounds = {};
+    for i=1, #battleGrounds do
+      if (i ~= tonumber(rmIndex)) then
+        table.insert(newBattleGrounds, battleGrounds[i]);
+      end
+    end
+    self.db.global[BGTHPH.realm].myChars[UnitName("player")].battlegrounds = newBattleGrounds
+  end
+end
+
 function BGTHPH:averageLastNGames(games)
   local totalGames = 0;
   local totalHonor = 0;
@@ -57,22 +76,20 @@ function BGTHPH:calcRemainingGames()
 end
 
 function BGTHPH:getHPHCalc()
+  sessionStartHonor = self.db.global[BGTHPH.realm].myChars[UnitName("player")].sessionStartHonor;
+  sessionHonor = self.db.global[BGTHPH.realm].myChars[UnitName("player")].sessionHonor;
+
   sessionStart = BGTHPH.loadTime;
-  oneHourAgo = GetServerTime() - 3600;
+  timeSinceSessionStart = GetServerTime() - BGTHPH.loadTime;
+  oneHourAgo = GetServerTime() - math.min(timeSinceSessionStart, 3600);
   local hourlyHonor = 0;
-  local sessionHonor = 0;
-  battleGrounds = self.db.global[BGTHPH.realm].myChars[UnitName("player")].battlegrounds;
-  if battleGrounds then
-    for k, v in pairs(battleGrounds) do
-      if (v.startTime > oneHourAgo) then
-        hourlyHonor = hourlyHonor + v.honorGain;
-      end
-      if (v.startTime > sessionStart) then
-        sessionHonor = sessionHonor + v.honorGain;
-      end
+  honorRecords = self.db.global[BGTHPH.realm].myChars[UnitName("player")].honorRecords;
+  if honorRecords then
+    for k, v in pairs(honorRecords) do
+      hourlyHonor = hourlyHonor + v.honorGained;
     end
   end
-  return sessionHonor, hourlyHonor;
+  return math.floor((sessionHonor/timeSinceSessionStart)*3600), math.floor((hourlyHonor/min(timeSinceSessionStart, 3600))*3600);
 end
 
 function BGTHPH:removeStaleActiveBg()
@@ -195,3 +212,53 @@ function BGTHPH:clearBattleGrounds()
   self.db.global[BGTHPH.realm].myChars[UnitName("player")].battlegrounds = {};
   print("Battlegrounds cleared");
 end
+
+function BGTHPH:clearStale(honorRecords)
+  if honorRecords then
+    local oneHourAgo = GetServerTime() - 3600;
+    local cleared = {};
+    for k, v in pairs(honorRecords) do
+      if (v.timestamp > oneHourAgo) then
+        table.insert(cleared, self.db.global[BGTHPH.realm].myChars[UnitName("player")].honorRecords[k]);
+      end
+    end
+    self.db.global[BGTHPH.realm].myChars[UnitName("player")].honorRecords = cleared;
+  end
+end
+
+function BGTHPH:clearSessionHonor()
+  self.db.global[BGTHPH.realm].myChars[UnitName("player")].sessionHonor = 0;
+end
+
+function BGTHPH:recordHonorGain(...)
+  local text = ...;
+  local honorGained;
+
+  honorGained = string.match(text, "%d+");
+  if (not honorGained) then
+    BGTHPH:debug("Honor error:", text);
+    return;
+  end
+
+  local h = {
+    honorGained = honorGained,
+    timestamp = GetServerTime(),
+  }
+
+  honorRecords = self.db.global[BGTHPH.realm].myChars[UnitName("player")].honorRecords
+
+  table.insert(honorRecords, h);
+  self.db.global[BGTHPH.realm].myChars[UnitName("player")].honorRecords = honorRecords;
+  self.db.global[BGTHPH.realm].myChars[UnitName("player")].sessionHonor = self.db.global[BGTHPH.realm].myChars[UnitName("player")].sessionHonor + honorGained;
+  self:clearStale(honorRecords);
+end
+
+local f = CreateFrame("Frame");
+if (BGTHPH.expansionNum < 4) then
+  f:RegisterEvent("CHAT_MSG_COMBAT_HONOR_GAIN");
+end
+f:SetScript("OnEvent", function(self, event, ...)
+  if (event == "CHAT_MSG_COMBAT_HONOR_GAIN") then
+    BGTHPH:recordHonorGain(...)
+  end
+end)
