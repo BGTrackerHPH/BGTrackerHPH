@@ -22,21 +22,30 @@ function BGTHPH:removeLastBattlegroundEntry(index)
   end
 end
 
+function BGTHPH:formatDuration(duration)
+  local hours = math.floor(duration/3600);
+  local minutes =  math.floor((duration % 3600)/60);
+  local seconds =  duration % 60;
+  return format("%dh:%dm:%ds", hours, minutes, seconds);
+end
+
 function BGTHPH:averageLastNGames(games)
   local totalGames = 0;
   local totalHonor = 0;
+  local totalDuration = 0;
   if (games) then
     for k, v in pairs(games) do
       totalGames = totalGames + 1;
       totalHonor = totalHonor + v.honorGain;
+      totalDuration = totalDuration + v.duration;
     end
   end
 
   if (totalGames == 0) then
-    return 0;
+    return 0, 0;
   end
 
-  return totalHonor/totalGames;
+  return (totalHonor/totalGames), self:formatDuration(totalDuration/totalGames) ;
 end
 
 function BGTHPH:last(arr, num)
@@ -69,10 +78,10 @@ function BGTHPH:calcRemainingGames()
     end
   end 
 
-  numGamesLast10 = self:averageLastNGames(last10Games);
-  numGamesLast50 = self:averageLastNGames(last50Games);
+  numGamesLast10, last10AvgDuration = self:averageLastNGames(last10Games);
+  numGamesLast50, last50AvgDuration = self:averageLastNGames(last50Games);
 
-  return math.ceil(remaining/numGamesLast10), math.ceil(remaining/numGamesLast50), math.floor(numGamesLast10), math.floor(numGamesLast50);
+  return math.ceil(remaining/numGamesLast10), math.ceil(remaining/numGamesLast50), math.floor(numGamesLast10), last10AvgDuration, math.floor(numGamesLast50), last50AvgDuration;
 end
 
 function BGTHPH:getHPHCalc()

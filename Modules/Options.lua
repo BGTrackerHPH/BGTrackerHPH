@@ -63,7 +63,7 @@ function BGTHPH:buildDatabase()
     self.db.global[BGTHPH.realm].myChars[UnitName("player")].activeBg = {};
   end
   if (not self.db.global[BGTHPH.realm].myChars[UnitName("player")].targetHonor) then
-    self.db.global[BGTHPH.realm].myChars[UnitName("player")].targetHonor = self:getMaxHonorForRank(UnitPVPRank("player"));
+    self.db.global[BGTHPH.realm].myChars[UnitName("player")].targetHonor = 500000; -- need to update to default based on actual rank
   end
   self.data = self.db.global[BGTHPH.realm];
 end

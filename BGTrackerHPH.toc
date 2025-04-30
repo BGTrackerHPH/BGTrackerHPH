@@ -2,7 +2,7 @@
 ## Title: BG Tracker HPH
 ## Notes: This addon will track your honor in AV, your win/loss rate, as well as the average duration of the games to inform you how many more AV games you need to hit your goal.
 ## Author: Relis <H A T E D> - Nightslayer
-## Version: 0.1.5
+## Version: 0.1.6
 ## RequiredDeps:
 ## X-Curse-Project-ID: 1249571
 ## SavedVariables: 

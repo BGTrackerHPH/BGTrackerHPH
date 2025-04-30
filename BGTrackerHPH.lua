@@ -111,14 +111,16 @@ end
 function BGTHPH:getMinimapButtonData()
   self:setCurrentHonor();
   session, hour = self:getHPHCalc();
-  numGamesLast10, numGamesLast50, averageLast10, averageLast50 = self:calcRemainingGames();
+  numGamesLast10, numGamesLast50, averageLast10, averageDurationLast10, averageLast50, averageDurationLast50 = self:calcRemainingGames();
   return "Current Honor: " .. self.db.global[BGTHPH.realm].myChars[UnitName("player")].currentWeekHonor .. "\n"
     .. "Honor/Hour (past hour): " .. hour .. "\n"
-    .. "Honor/Session: " .. session .. "\n"
+    .. "Honor/Hour (Session): " .. session .. "\n"
     .. "Remaining Games (last 10 avg): " .. numGamesLast10 .. "\n"
     .. "Last 10 Games Average: " .. averageLast10 .. "\n"
+    .. "Last 10 Games Avg Duration " .. averageDurationLast10 .. "\n"
     .. "Remaining Games (last 50 avg): " .. numGamesLast50 .. "\n"
-    .. "Last 50 Games Average: " .. averageLast50
+    .. "Last 50 Games Average: " .. averageLast50 .. "\n"
+    .. "Last 50 Games Avg Duration " .. averageDurationLast50
   ;
 end
 
@@ -167,7 +169,7 @@ function BGTHPH:removeLastBg(arg)
   self:removeLastBattlegroundEntry(arg);
 end
 
-SLASH_BGTHPHCMD1, SLASH_BGTHPHCMD2 = '/BGTHPH', '/amidoneyet';
+SLASH_BGTHPHCMD1, SLASH_BGTHPHCMD2 = '/bgthph', '/bgtr';
 function SlashCmdList.BGTHPHCMD(msg, editBox)
   local cmd, arg, extra;
   if (msg) then
