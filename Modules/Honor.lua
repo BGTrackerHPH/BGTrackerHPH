@@ -126,6 +126,7 @@ function BGTHPH:exitBattleGroundUpdate()
   currentZone = GetZoneText();
   activeBg = self.db.global[BGTHPH.realm].myChars[UnitName("player")].activeBg;
   if (activeBg.startTime) then
+    hk, hp = GetPVPThisWeekStats();
     battleGrounds = self.db.global[BGTHPH.realm].myChars[UnitName("player")].battlegrounds;
     previousZone = activeBg.instance;
     if (currentZone ~= previousZone) then
